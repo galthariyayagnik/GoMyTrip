@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Accommodation Details</title>
+<link rel="stylesheet" href="accommodation.css">
+
+<style>
+    
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+.popup-box {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    width: 360px;
+}
+.popup-box input,
+.popup-box select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 10px;
+}
+.popup-box button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.hidden { display: none; }
+.row { display: flex; gap: 10px; }
+
+</style>
+</head>
+
+<body>
+<!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <i class="fas fa-temple"></i>
+                    GoMyTrip
+                </a>
+                
+                <ul class="nav-links">
+                    <li><a href="../home.html">Home</a></li>
+                    <li><a href="accommodation.html">Accommodation</a></li>
+                    <li><a href="../Query/query.html">Put Your Query</a></li>
+                    <li><a href="../review/review.html">Review</a></li>
+                </ul>
+
+                <div class="user-profile">
+                    <div class="user-menu-container">
+                <i class="fas fa-user-circle user-icon" id="userIcon"></i>
+
+
+                    <div class="user-dropdown" id="userDropdown">
+                      <!-- Menu items load dynamically -->
+                    </div>
+                </div>
+
+                </div>
+            </div>
+        </div>
+    </header>
+<div class="container" id="details-box">Loading...</div>
+
+<!-- DATE SELECTION -->
+<div id="dateOverlay" class="overlay hidden">
+  <div class="popup-box">
+    <h3>Select Dates</h3>
+    <label>Check-in</label>
+    <input type="date" id="checkinDate">
+    <label>Check-out</label>
+    <input type="date" id="checkoutDate">
+    <div class="form-group">
+        <label>No. of Rooms</label>
+        <select id="roomCount" onchange="updateGuests()">
+            <option value="1">1 Room</option>
+            <option value="2">2 Rooms</option>
+            <option value="3">3 Rooms</option>
+            <option value="4">4 Rooms</option>
+        </select>
+    </div>
+
+    <!-- Total Guests (Auto) -->
+    <div class="form-group">
+        <label>Total Guests</label>
+        <input type="number" id="totalGuests" readonly>
+    </div>
+
+    <!-- Extra Person -->
+    <div class="form-group">
+        <label>Extra Person</label>
+        <select id="extraPerson" onchange="updateGuests()">
+            <option value="0">No</option>
+            <option value="1">Yes (1 Person)</option>
+        </select>
+    </div>
+
+    <button onclick="applyDates()">Book Now</button>
+  </div>
+</div>
+<div class="booking-options">
+
+
+<!-- CUSTOMER DETAILS -->
+<div id="customerOverlay" class="overlay hidden">
+  <div class="popup-box">
+    <h3>Customer Details</h3>
+
+    <input id="fname" placeholder="First Name">
+    <input id="lname" placeholder="Last Name">
+    <input id="email" placeholder="Email">
+    <input id="phone" placeholder="Contact No">
+
+    <label>Arrival Date & Time</label>
+    <input type="datetime-local" id="arrival">
+
+    <div class="row">
+      <select id="state">
+        <option value="">State</option>
+        <option>Gujarat</option>
+        <option>Maharashtra</option>
+      </select>
+      <select id="city">
+        <option value="">City</option>
+        <option>Bhavnagar</option>
+        <option>Ahmedabad</option>
+      </select>
+    </div>
+
+    <button onclick="confirmBooking()">Confirm Booking</button>
+  </div>
+</div>
+
+<script>
+/* ================= LOGIN CHECK (FINAL) ================= */
+
+function isUserLoggedIn() {
+    try {
+        const user = JSON.parse(localStorage.getItem("loggedInUser"));
+        return user && user.email;
+    } catch {
+        return false;
+    }
+}
+
+/* ================= LOAD DATA ================= */
+
+const hotels = JSON.parse(localStorage.getItem("hotels") || "[]");
+const hotelId = localStorage.getItem("hotelId");
+let selectedRoom = "";
+
+const container = document.getElementById("details-box");
+
+if (!hotelId || !hotels[hotelId]) {
+    container.innerHTML = "<p>Hotel not found</p>";
+} else {
+    const h = hotels[hotelId];
+
+    container.innerHTML = `
+        <img src="${h.image}" class="banner">
+        <h1>${h.name}</h1>
+        <p class="location">📍 ${h.location}</p>
+        <p class="price">₹${h.price} / night</p>
+
+        <h2 class="section-title">Room Types</h2>
+
+        ${(h.rooms || []).map(r => `
+            <div class="room-card">
+                <img src="${r.photo || '../no-image.png'}" class="room-img">
+                <div class="room-info">
+                    <h3>${r.name}</h3>
+                    <p class="room-price">₹${r.price} / night</p>
+                </div>
+                <button class="book-btn" onclick="openCalendar('${r.name}')">
+                    Book Now
+                </button>
+            </div>
+        `).join("")}
+    `;
+}
+
+/* ================= BOOK FLOW ================= */
+
+function openCalendar(room) {
+    selectedRoom = room;
+    document.getElementById("dateOverlay").classList.remove("hidden");
+}
+
+function applyDates() {
+
+    const checkIn = checkinDate.value;
+    const checkOut = checkoutDate.value;
+
+    if (!checkIn || !checkOut) {
+        alert("Please select dates");
+        return;
+    }
+
+    localStorage.setItem("checkInDate", checkIn);
+    localStorage.setItem("checkOutDate", checkOut);
+
+    document.getElementById("dateOverlay").classList.add("hidden");
+
+    // 🔐 FINAL LOGIN CHECK
+    if (isUserLoggedIn()) {
+        showCustomerForm();
+    } else {
+        localStorage.setItem("redirectAfterLogin", window.location.href);
+        localStorage.setItem("pendingBooking", "true");
+
+        alert("Please login to continue booking");
+        window.location.href = "../user-login.html";
+    }
+}
+
+/* ================= RESUME AFTER LOGIN ================= */
+
+window.onload = function () {
+    if (
+        localStorage.getItem("pendingBooking") === "true" &&
+        isUserLoggedIn()
+    ) {
+        localStorage.removeItem("pendingBooking");
+        showCustomerForm();
+    }
+};
+
+/* ================= CUSTOMER FORM ================= */
+
+function showCustomerForm() {
+    document.getElementById("customerOverlay").classList.remove("hidden");
+}
+
+/* ================= CONFIRM BOOKING ================= */
+
+function confirmBooking() {
+
+    const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+
+    bookings.push({
+        userEmail: user.email,
+        hotel: hotels[hotelId].name,
+        room: selectedRoom,
+        checkIn: localStorage.getItem("checkInDate"),
+        checkOut: localStorage.getItem("checkOutDate")
+    });
+
+    localStorage.setItem("bookings", JSON.stringify(bookings));
+
+    alert("Booking Pending!");
+    window.location.href = "../my-bookings.html";
+}
+/* SET ROOM CAPACITY (dynamic later) */
+let selectedRoomCapacity = 2;
+
+function updateGuests() {
+    const roomCount = parseInt(document.getElementById("roomCount").value);
+    const extraPerson = parseInt(document.getElementById("extraPerson").value);
+
+    let total = (roomCount * selectedRoomCapacity) + extraPerson;
+
+    document.getElementById("totalGuests").value = total;
+}
+
+/* Call once on page load */
+updateGuests();
+
+function selectRoom(capacity) {
+    selectedRoomCapacity = capacity;
+    updateGuests();
+}
+
+</script>
+
+</body>
+</html>

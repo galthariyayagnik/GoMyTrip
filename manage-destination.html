@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Destinations | GoMyTrip Admin</title>
+    <link rel="stylesheet" href="admin.css">
+    <script defer src="data.js"></script>
+</head>
+
+<body onload="checkAdminLogin()">
+
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <h2 class="sidebar-title">GoMyTrip Admin</h2>
+    <a href="admin.html" class="menu-item">📊 Dashboard</a>
+    <a href="manage-booking.html" class="menu-item">🧾 Booking</a>
+    <a href="manage-hotel.html" class="menu-item">🏨 Manage Hotel</a>
+    <a href="manage-destination.html" class="menu-item">🌍 Destination</a>
+    <a href="manage-qeury.html" class="menu-item">🔍 Manage Query</a>
+    <a href="manage-review.html" class="menu-item active">★☆ Review</a>
+    <a href="create-admin.html" class="menu-item">👤 Create Admin</a>
+    <a href="revenue.html" class="menu-item">
+        <i class="icon">📈</i> Revenue
+    </a>
+    <button onclick="adminLogout()" class="admin-btn">Logout</button>
+</aside>
+
+<!-- Main Panel -->
+<main class="main-panel">
+
+    <div class="top-header">
+        <h2>Manage Top Destinations</h2>
+        <button onclick="openForm()" class="add-btn">+ Add Destination</button>
+    </div>
+
+    <div class="table-box">
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Destination Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="dest-table"></tbody>
+        </table>
+    </div>
+</main>
+
+<!-- Popup Form -->
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <h3 id="form-title">Add Destination</h3>
+
+        <label>Destination Name</label>
+        <input type="text" id="dest-name">
+
+        <label>Image URL</label>
+        <input type="text" id="dest-image">
+
+        <button class="save-btn" onclick="saveDestination()">Save</button>
+        <button class="close-btn" onclick="closeForm()">Cancel</button>
+    </div>
+</div>
+
+<script>
+let destinations = JSON.parse(localStorage.getItem("destinations")) || [];
+let editIndex = null;
+
+function loadDestinations() {
+    document.getElementById("dest-table").innerHTML = destinations.map((d, i) => `
+        <tr>
+            <td><img src="${d.image}" width="80" style="border-radius:8px;"></td>
+            <td>${d.name}</td>
+            <td>
+                <button class="edit-btn" onclick="editDestination(${i})">Edit</button>
+                <button class="delete-btn" onclick="deleteDestination(${i})">Delete</button>
+            </td>
+        </tr>
+    `).join("");
+}
+
+function openForm() {
+    editIndex = null;
+    document.getElementById("form-title").innerText = "Add Destination";
+
+    document.getElementById("dest-name").value = "";
+    document.getElementById("dest-image").value = "";
+
+    document.getElementById("popup").style.display = "flex";
+}
+
+function closeForm() {
+    document.getElementById("popup").style.display = "none";
+}
+
+function editDestination(i) {
+    editIndex = i;
+    let d = destinations[i];
+
+    document.getElementById("form-title").innerText = "Edit Destination";
+    document.getElementById("dest-name").value = d.name;
+    document.getElementById("dest-image").value = d.image;
+
+    document.getElementById("popup").style.display = "flex";
+}
+
+function saveDestination() {
+    let dest = {
+        name: document.getElementById("dest-name").value,
+        image: document.getElementById("dest-image").value
+    };
+
+    if (editIndex === null) destinations.push(dest);
+    else destinations[editIndex] = dest;
+
+    localStorage.setItem("destinations", JSON.stringify(destinations));
+    closeForm();
+    loadDestinations();
+}
+
+function deleteDestination(i) {
+    if (!confirm("Delete this destination?")) return;
+
+    destinations.splice(i, 1);
+    localStorage.setItem("destinations", JSON.stringify(destinations));
+    loadDestinations();
+}
+
+loadDestinations();
+</script>
+
+<style>
+.popup { 
+    display:none; position:fixed; top:0; left:0; 
+    width:100%; height:100%; background:#0007;
+    justify-content:center; align-items:center;
+}
+.popup-content {
+    background:white; padding:20px; width:350px;
+    border-radius:10px;
+}
+.close-btn {
+    margin-top:10px; background:#777; color:white;
+    padding:10px; width:100%;
+}
+</style>
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+<h2>My Bookings</h2>
+<div id="bookingList"></div>
+
+<script>
+let all = JSON.parse(localStorage.getItem("bookings")) || [];
+let user = JSON.parse(localStorage.getItem("loggedUser"));
+
+let myBookings = all.filter(b => b.userEmail === user.email);
+
+document.getElementById("bookingList").innerHTML =
+    myBookings.length
+        ? myBookings.map(b => `
+            <div class="booking-card">
+                <h3>${b.hotelName}</h3>
+                <p>Status: ${b.status}</p>
+                <p>Date: ${b.date}</p>
+            </div>
+        `).join("")
+        : "<p>No bookings found.</p>";
+</script>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Manage Reviews</title>
+<link rel="stylesheet" href="admin.css">
+
+<body onload="checkAdminLogin()">
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f8;
+    margin:0;
+}
+
+.container{
+    max-width:1200px;
+    margin:30px auto;
+    margin-left:260px;  
+    background:#fff;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+
+h2{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+/* FILTER */
+.filter{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:15px;
+}
+select{
+    padding:8px;
+    border-radius:6px;
+}
+
+/* TABLE FIX */
+table{
+    width:100%;
+    table-layout:fixed;
+    border-collapse:collapse;
+}
+
+th,td{
+    padding:10px;
+    border:1px solid #ddd;
+    text-align:left;
+    vertical-align:top;
+    word-wrap:break-word;
+}
+
+/* HEADER TEXT VISIBILITY FIX */
+th{
+    background:#2c3e50;
+    color:#ffffff !important;
+    font-weight:600;
+}
+
+/* COLUMN WIDTHS */
+th:nth-child(1),td:nth-child(1){width:12%;}
+th:nth-child(2),td:nth-child(2){width:32%;}
+th:nth-child(3),td:nth-child(3){width:16%;}
+th:nth-child(4),td:nth-child(4){width:12%;}
+th:nth-child(5),td:nth-child(5){width:28%;}
+
+/* BADGES */
+.badge{
+    padding:4px 10px;
+    border-radius:12px;
+    color:#fff;
+    font-size:12px;
+    display:inline-block;
+}
+.replied{background:#27ae60;}
+.notreplied{background:#f39c12;}
+
+/* BUTTON */
+.btn{
+    background:#e74c3c;
+    color:#fff;
+    border:none;
+    padding:6px 10px;
+    border-radius:4px;
+    cursor:pointer;
+    margin-top:5px;
+}
+
+textarea{
+    width:100%;
+    resize:none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px){
+    .container{
+        margin-left:0;
+    }
+}
+</style>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <h2 class="sidebar-title">GoMyTrip Admin</h2>
+    <a href="admin.html" class="menu-item">📊 Dashboard</a>
+    <a href="manage-booking.html" class="menu-item">🧾 Booking</a>
+    <a href="manage-hotel.html" class="menu-item">🏨 Manage Hotel</a>
+    <a href="manage-destination.html" class="menu-item">🌍 Destination</a>
+    <a href="manage-qeury.html" class="menu-item">🔍 Manage Query</a>
+    <a href="manage-review.html" class="menu-item active">★☆ Review</a>
+    <a href="create-admin.html" class="menu-item">👤 Create Admin</a>
+    <a href="revenue.html" class="menu-item">
+        <i class="icon">📈</i> Revenue
+    </a>
+    <button onclick="adminLogout()" class="admin-btn">Logout</button>
+</aside>
+
+<!-- Main Panel -->
+<div class="container">
+    <h2>Manage Reviews</h2>
+
+    <div class="filter">
+        <select onchange="load(this.value)">
+            <option value="All">All Reviews</option>
+            <option value="Replied">Replied</option>
+            <option value="NotReplied">Not Replied</option>
+        </select>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Review</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Reply</th>
+            </tr>
+        </thead>
+        <tbody id="reviewTable"></tbody>
+    </table>
+</div>
+
+<script>
+let reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+
+function load(filter="All"){
+    reviewTable.innerHTML="";
+
+    if(reviews.length === 0){
+        reviewTable.innerHTML = `
+        <tr>
+            <td colspan="5">No reviews found</td>
+        </tr>`;
+        return;
+    }
+
+    reviews.forEach((r,i)=>{
+        if(filter==="Replied" && !r.reply) return;
+        if(filter==="NotReplied" && r.reply) return;
+
+        reviewTable.innerHTML += `
+        <tr>
+            <td>${r.name}</td>
+            <td>${r.message}</td>
+            <td>${r.date}</td>
+            <td>
+                <span class="badge ${r.reply ? 'replied' : 'notreplied'}">
+                    ${r.reply ? "Replied" : "Not Replied"}
+                </span>
+            </td>
+            <td>
+                ${
+                    r.reply
+                    ? r.reply
+                    : `<textarea id="reply${i}" rows="3"></textarea>
+                       <button class="btn" onclick="reply(${i})">Reply</button>`
+                }
+            </td>
+        </tr>`;
+    });
+}
+
+function reply(index){
+    const text = document.getElementById("reply"+index).value;
+    if(!text){
+        alert("Reply cannot be empty");
+        return;
+    }
+    reviews[index].reply = text;
+    localStorage.setItem("reviews", JSON.stringify(reviews));
+    load();
+}
+
+load();
+</script>
+
+</body>
+</html>

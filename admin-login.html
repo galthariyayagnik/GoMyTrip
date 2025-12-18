@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - GoMyTrip</title>
+    <link rel="stylesheet" href="admin.css">
+
+    <style>
+        
+    </style>
+</head>
+<body>
+
+<div class="admin-login-box">
+    <h2>Admin Login</h2>
+
+    <form action="admin.html">
+        <input type="text" id="adminUsername" placeholder="Username">
+        <input type="password" id="adminPassword" placeholder="Password">
+        <p id="loginError"></p>      
+        <button class="admin-btn" onclick="adminLogin()">Login</button>
+        <p id="loginError" style="color:red;text-align:center;"></p>
+        
+    </form>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Put Your Query</title>
+<!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+     
+    <!-- Main CSS -->
+     <link rel="stylesheet" href="/User Page/Accommodation/accommodation.css" />
+     <!-- Font Awesome -->
+    <link rel="stylesheet" 
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+<style>
+
+/* Header Styles */
+.header {
+    background-color: #fff;
+    padding: 0px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #2c3e50;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.logo i {
+    margin-right: 10px;
+    font-size: 32px;
+    color: #e67e22;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+}
+
+.nav-links li {
+    margin-left: 35px;
+}
+
+.nav-links a {
+    color: #2c3e50;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 10px 0;
+    transition: color 0.3s;
+    position: relative;
+}
+
+.nav-links a:hover {
+    color: #e67e22;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #e67e22;
+    transition: width 0.3s;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+}
+
+.user-profile i {
+    font-size: 24px;
+    color: #2c3e50;
+    cursor: pointer;
+    margin-left: 20px;
+    transition: color 0.3s;
+}
+
+.user-profile i:hover {
+    color: #e67e22;
+}
+.user-dropdown {
+    position: absolute;
+    right: 0;
+    top: 50px;
+    background: white;
+    border-radius: 10px;
+    padding: 10px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    display: none;
+    min-width: 160px;
+    z-index: 1000;
+}
+.user-menu-container {
+    position: relative;
+}
+.user-dropdown a {
+    display: block;
+    padding: 10px 14px;
+    text-decoration: none;
+    color: #333;
+    font-size: 15px;
+}
+
+.user-dropdown a:hover {
+    background: #f5f5f5;
+}
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f8;
+}
+.container{
+    max-width:700px;
+    margin:40px auto;
+    background:#fff;
+    padding:30px;
+    border-radius:10px;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+h2{text-align:center;margin-bottom:20px;}
+.tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+.tabs button{
+    flex:1;
+    padding:10px;
+    border:none;
+    background:#ddd;
+    cursor:pointer;
+    border-radius:6px;
+}
+.tabs button.active{
+    background:#e74c3c;
+    color:#fff;
+}
+.form-group{
+    margin-bottom:15px;
+}
+input,select,textarea{
+    width:100%;
+    padding:8px;
+    margin-top:5px;
+}
+textarea{resize:none;}
+.add-btn{
+    background:#3498db;
+    color:#fff;
+    border:none;
+    padding:6px 10px;
+    cursor:pointer;
+    margin-top:5px;
+}
+.submit-btn{
+    width:100%;
+    background:#e74c3c;
+    color:#fff;
+    padding:12px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+.hidden{display:none;}
+.destination-box{
+    display:flex;
+    gap:10px;
+    margin-top:5px;
+}
+</style>
+</head>
+
+<body>
+<!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <i class="fas fa-temple"></i>
+                    GoMyTrip
+                </a>
+                
+                <ul class="nav-links">
+                    <li><a href="../home.html">Home</a></li>
+                    <li><a href="../Accommodation/accommodation.html">Accommodation</a></li>
+                    <li><a href="query.html">Put Your Query</a></li>
+                    <li><a href="../Review/review.html">Review</a></li>
+                </ul>
+
+                <div class="user-profile">
+                    <div class="user-menu-container">
+                <i class="fas fa-user-circle user-icon" id="userIcon"></i>
+
+
+                    <div class="user-dropdown" id="userDropdown">
+                      <!-- Menu items load dynamically -->
+                    </div>
+                </div>
+
+                </div>
+            </div>
+        </div>
+    </header>
+
+<div class="container">
+    <h2>Put Your Query</h2>
+
+    <div class="tabs">
+        <button id="newTab" class="active" onclick="showNew()">New Query</button>
+        <button id="existTab" onclick="showExist()">Existing Query</button>
+    </div>
+
+    <!-- NEW QUERY -->
+    <div id="newQuery">
+        <div class="form-group">
+            <label>Full Name *</label>
+            <input id="name" required>
+        </div>
+
+        <div class="form-group">
+            <label>Email *</label>
+            <input id="email" required>
+        </div>
+
+        <div class="form-group">
+            <label>Contact Number *</label>
+            <input id="phone" required>
+        </div>
+
+        <div class="form-group">
+            <label>Travel Destination *</label>
+            <div id="destinations">
+                <div class="destination-box">
+                    <input class="destination" placeholder="Destination">
+                </div>
+            </div>
+            <button class="add-btn" onclick="addDestination()">+ Add More Destination</button>
+        </div>
+
+        <div class="form-group">
+            <label>Check-in Date *</label>
+            <input type="date" id="checkin">
+        </div>
+
+        <div class="form-group">
+            <label>Total Guests *</label>
+            <input type="number" id="guests">
+        </div>
+
+        <div class="form-group">
+            <label>Special Note *</label>
+            <textarea id="note"></textarea>
+        </div>
+
+        <button class="submit-btn" onclick="submitNew()">Submit New Query</button>
+    </div>
+
+    <!-- EXISTING QUERY -->
+    <div id="existQuery" class="hidden">
+        <div class="form-group">
+            <label>Booking ID *</label>
+            <input id="bookingId">
+        </div>
+
+        <div class="form-group">
+            <label>Query Type *</label>
+            <select id="queryType">
+                <option value="">Select</option>
+                <option>Cancel</option>
+                <option>Refund</option>
+                <option>Other</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Special Note *</label>
+            <textarea id="existNote"></textarea>
+        </div>
+
+        <button class="submit-btn" onclick="submitExisting()">Submit Existing Query</button>
+    </div>
+</div>
+
+<script>
+function showNew(){
+    newTab.classList.add("active");
+    existTab.classList.remove("active");
+    newQuery.classList.remove("hidden");
+    existQuery.classList.add("hidden");
+}
+function showExist(){
+    existTab.classList.add("active");
+    newTab.classList.remove("active");
+    existQuery.classList.remove("hidden");
+    newQuery.classList.add("hidden");
+}
+
+function addDestination(){
+    destinations.innerHTML += `
+        <div class="destination-box">
+            <input class="destination" placeholder="Destination">
+        </div>`;
+}
+
+function submitNew(){
+    let queries = JSON.parse(localStorage.getItem("queries")) || [];
+
+    queries.push({
+        type:"New",
+        name:name.value,
+        email:email.value,
+        phone:phone.value,
+        destinations:[...document.querySelectorAll(".destination")].map(d=>d.value),
+        checkin:checkin.value,
+        guests:guests.value,
+        note:note.value,
+        status:"Pending"
+    });
+
+    localStorage.setItem("queries",JSON.stringify(queries));
+    alert("Query Submitted Successfully");
+    location.reload();
+}
+
+function submitExisting(){
+    let queries = JSON.parse(localStorage.getItem("queries")) || [];
+
+    queries.push({
+        type:"Existing",
+        bookingId:bookingId.value,
+        queryType:queryType.value,
+        note:existNote.value,
+        status:"Pending"
+    });
+
+    localStorage.setItem("queries",JSON.stringify(queries));
+    alert("Query Submitted Successfully");
+    location.reload();
+}
+
+loadDestinations();
+/* USER MENU SYSTEM */
+
+// Check login status
+let loggedUser = JSON.parse(localStorage.getItem("loggedUser")) || null;
+function updateUserMenu() {
+    let menu = document.getElementById("userDropdown");
+    if (!menu) return;
+
+    if (loggedUser) {
+        // User logged in
+        menu.innerHTML = `
+            <a href="../User Page/user-profile.html">My Profile</a>
+            <a href="../User Page/my-bookings.html">My Bookings</a>
+            <a href="#" id="logoutBtn">Logout</a>
+        `;
+
+        // Add logout event
+        setTimeout(() => {
+            document.getElementById("logoutBtn").onclick = () => {
+                localStorage.removeItem("loggedUser");
+                loggedUser = null;
+                updateUserMenu();
+                alert("Logged out!");
+            }
+        }, 10);
+
+    } else {
+        // User NOT logged in
+        menu.innerHTML = `
+            <a href="../User Page/user-login.html">Login</a>
+            <a href="../User Page/user-register.html">Register</a>
+        `;
+    }
+}
+
+// Toggle menu visibility
+document.getElementById("userIcon")?.addEventListener("click", () => {
+    let dropdown = document.getElementById("userDropdown");
+    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+});
+
+updateUserMenu();
+</script>
+
+</body>
+</html>

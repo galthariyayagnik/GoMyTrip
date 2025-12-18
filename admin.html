@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GoMyTrip Admin Dashboard</title>
+    <link rel="stylesheet" href="admin.css">
+    <script defer src="data.js"></script>
+    <script defer src="admin.js"></script>
+</head>
+
+<body onload="checkAdminLogin()">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <h2 class="sidebar-title">GoMyTrip Admin</h2>
+
+    <a href="admin.html" class="menu-item">
+        <i class="icon">📊</i> Dashboard
+    </a>
+
+    <a href="manage-booking.html" class="menu-item">
+        <i class="icon">🧾</i> Booking
+    </a>
+
+    <a href="manage-hotel.html" class="menu-item">
+        <i class="icon">🏨</i> Manage Hotel
+    </a>
+
+    <a href="manage-destination.html" class="menu-item">
+        <i class="icon">🌍</i> Manage Top Destination
+    </a>
+
+    <a href="manage-review.html" class="menu-item">
+        <i class="icon">★☆</i> View Review
+    </a>
+
+    <a href="manage-qeury.html" class="menu-item">
+        <i class="icon">🔍</i> Manage Query
+    </a>
+
+    <a href="create-admin.html" class="menu-item">
+        <i class="icon">👤</i> Create Sub Admin
+    </a>
+
+    <a href="revenue.html" class="menu-item">
+        <i class="icon">📈</i> Revenue
+    </a>
+    <button onclick="adminLogout()" class="admin-btn">Logout</button>
+</aside>
+
+<!-- Main Admin Content -->
+<main class="main-panel">
+
+    <!-- Top Header -->
+    <div class="top-header">
+        <h2>Main Admin Dashboard</h2>
+    </div>
+
+    <!-- Dashboard Overview Cards -->
+    <section class="dashboard-cards">
+
+        <div class="card">
+            <h3>Total Bookings</h3>
+            <p>Today's Bookings</p>
+            <span id="total-bookings" class="number">0</span>
+        </div>
+
+        <div class="card">
+            <h3>Active Hotels</h3>
+            <p>Currently Available</p>
+            <span id="active-hotels" class="number">0</span>
+        </div>
+
+        <div class="card">
+            <h3>Total Revenue</h3>
+            <p>This Month</p>
+            <span id="total-revenue" class="number">₹0</span>
+        </div>
+
+        <div class="card">
+            <h3>Sub Admins</h3>
+            <p>Active Users</p>
+            <span id="active-admins" class="number">0</span>
+        </div>
+
+    </section>
+
+    <!-- Recent Bookings Table -->
+    <section class="recent-bookings">
+        <h3>Recent Bookings</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Guest Name</th>
+                    <th>Hotel</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Status</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+
+            <tbody id="recent-bookings">
+                <!-- Dynamic rows from admin.js -->
+            </tbody>
+        </table>
+    </section>
+
+</main>
+
+</body>
+</html>

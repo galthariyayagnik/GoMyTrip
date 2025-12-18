@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Hotels | GoMyTrip Admin</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body onload="checkAdminLogin()">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <h2 class="sidebar-title">GoMyTrip Admin</h2>
+    <a href="admin.html" class="menu-item">📊 Dashboard</a>
+    <a href="manage-booking.html" class="menu-item">🧾 Booking</a>
+    <a href="manage-hotel.html" class="menu-item">🏨 Manage Hotel</a>
+    <a href="manage-destination.html" class="menu-item">🌍 Destination</a>
+    <a href="manage-qeury.html" class="menu-item">🔍 Manage Query</a>
+    <a href="manage-review.html" class="menu-item active">★☆ Review</a>
+    <a href="create-admin.html" class="menu-item">👤 Create Admin</a>
+    <a href="revenue.html" class="menu-item">
+        <i class="icon">📈</i> Revenue
+    </a>
+    <button onclick="adminLogout()" class="admin-btn">Logout</button>
+</aside>
+
+<!-- MAIN PANEL -->
+<main class="main-panel">
+
+    <div class="top-header">
+        <h2>Manage Hotels</h2>
+        <button onclick="openForm()" class="add-btn">+ Add Hotel</button>
+    </div>
+
+    <div class="table-box">
+        <table>
+            <thead>
+                <tr>
+                    <th>Hotel Name</th>
+                    <th>Location</th>
+                    <th>Base Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="hotel-table"></tbody>
+        </table>
+    </div>
+
+</main>
+
+<!-- POPUP FORM -->
+<div id="popup" class="popup">
+    <div class="popup-content">
+
+        <h2 id="form-title">Add Hotel</h2>
+
+        <!-- BASIC INFO -->
+        <div class="form-group">
+            <label>Hotel Name</label>
+            <input type="text" id="hotel-name">
+        </div>
+
+        <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="hotel-location">
+        </div>
+
+        <div class="form-group">
+            <label>Address</label>
+            <textarea id="hotel-address"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>GSt (%)</label>
+            <input type="number" id="gst">
+        </div>
+
+        <div class="form-group">
+            <label>Platform Fees (%)</label>
+            <input type="number" id="platform-fee">
+        </div>
+
+        <div class="form-group">
+            <label>extraPerson charge</label>
+            <input type="number" id="extra-person-charge">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group half">
+                <label>Check-in Time</label>
+                <input type="time" id="checkin-time">
+            </div>
+            <div class="form-group half">
+                <label>Check-out Time</label>
+                <input type="time" id="checkout-time">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Base Price</label>
+            <input type="number" id="hotel-price">
+        </div>
+        
+        <div class="form-group">
+            <label>Tearm And Condition</label>
+            <textarea id="term-and-condition"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Hotel Image URL</label>
+            <input type="text" id="hotel-image">
+        </div>
+
+        <!-- FACILITIES -->
+        <div class="form-group">
+            <label>Facilities</label><br>
+            <label><input type="checkbox" class="facility" value="Cancellation"> Cancellation</label><br>
+            <label><input type="checkbox" class="facility" value="Food"> Food</label><br>
+            <label><input type="checkbox" class="facility" value="Parking"> Parking</label>
+        </div>
+
+        <!-- ROOMS -->
+        <h3>Room Types</h3>
+        <div id="room-list"></div>
+        <button class="add-room-btn" onclick="addRoom()">+ Add Room Type</button>
+
+        <!-- BLOCK ROOMS -->
+        <h3>Block Rooms (Multiple)</h3>
+
+        <div class="form-group">
+            <label>Select Room Type</label>
+            <select id="block-room-type" multiple style="height:120px;"></select>
+            <small>Hold CTRL to select multiple rooms</small>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group half">
+                <label>Block From</label>
+                <input type="date" id="block-start">
+            </div>
+            <div class="form-group half">
+                <label>Block To</label>
+                <input type="date" id="block-end">
+            </div>
+        </div>
+
+        <button class="add-room-btn" onclick="addBlock()">+ Add Block</button>
+
+        <div id="block-list"></div>
+
+        <!-- ACTIONS -->
+        <button class="save-btn" onclick="saveHotel()">Save Hotel</button>
+        <button class="close-btn" onclick="closeForm()">Cancel</button>
+
+    </div>
+</div>
+
+<script>
+let hotels = JSON.parse(localStorage.getItem("hotels")) || [];
+let editIndex = null;
+let roomCount = 0;
+let blockList = [];
+
+/* LOAD TABLE */
+function loadHotels() {
+    document.getElementById("hotel-table").innerHTML = hotels.map((h, i) => `
+        <tr>
+            <td>${h.name}</td>
+            <td>${h.location}</td>
+            <td>₹${h.price}</td>
+            <td>
+                <button class="edit-btn" onclick="editHotel(${i})">Edit</button>
+                <button class="delete-btn" onclick="deleteHotel(${i})">Delete</button>
+            </td>
+        </tr>
+    `).join("");
+}
+
+/* OPEN FORM */
+function openForm() {
+    editIndex = null;
+    roomCount = 0;
+    blockList = [];
+
+    document.querySelectorAll("input, textarea").forEach(e => e.value = "");
+    document.querySelectorAll(".facility").forEach(c => c.checked = false);
+    document.getElementById("room-list").innerHTML = "";
+    document.getElementById("block-room-type").innerHTML = "";
+    document.getElementById("block-list").innerHTML = "";
+
+    document.getElementById("popup").style.display = "flex";
+}
+
+/* CLOSE FORM */
+function closeForm() {
+    document.getElementById("popup").style.display = "none";
+}
+
+/* ADD ROOM */
+function addRoom(name = "", price = "", capacity="", extraPerson="", photo = "") {
+    roomCount++;
+    document.getElementById("room-list").innerHTML += `
+        <div class="room-box">
+            <label>Room Name</label>
+            <input type="text" class="room-name" value="${name}">
+
+            <label>Room Price</label>
+            <input type="number" class="room-price" value="${price}">
+
+            <label>Room capacity</label>
+            <input type="number" class="room-capacity" value="${capacity}">
+
+            <label>Room Photo</label>
+            <input type="file" class="room-photo" accept="image/*">
+
+            ${photo ? `<small>Saved photo: ${photo}</small>` : ""}
+        </div>
+    `;
+}
+
+/* RENDER BLOCKS */
+function renderBlocks() {
+    document.getElementById("block-list").innerHTML = blockList.map((b, i) => `
+        <div class="room-box">
+            <strong>${b.rooms.join(", ")}</strong><br>
+            ${b.start} → ${b.end}
+            <button class="remove-room" onclick="removeBlock(${i})">Remove</button>
+        </div>
+    `).join("");
+}
+
+function removeBlock(i) {
+    blockList.splice(i, 1);
+    renderBlocks();
+}
+
+/* SAVE HOTEL */
+function saveHotel() {
+    let rooms = [...document.querySelectorAll(".room-box")].map(box => {
+    let fileInput = box.querySelector(".room-photo");
+    let photo = "";
+if (fileInput && fileInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function () {
+        photo = reader.result;
+    };
+    reader.readAsDataURL(fileInput.files[0]);
+}
+
+
+    return {
+        name: box.querySelector(".room-name")?.value,
+        price: box.querySelector(".room-price")?.value,
+        photo: photo
+    };
+}).filter(r => r.name && r.price);
+
+
+    let facilities = [...document.querySelectorAll(".facility:checked")].map(c => c.value);
+
+    let hotel = {
+        name: document.getElementById("hotel-name").value,
+        location: document.getElementById("hotel-location").value,
+        address: document.getElementById("hotel-address").value,
+        platformFee: document.getElementById("gst").value,
+        platformFee: document.getElementById("platform-fee").value,
+        platformFee: document.getElementById("extra-person-charge").value,
+        checkIn: document.getElementById("checkin-time").value,
+        checkOut: document.getElementById("checkout-time").value,
+        price: document.getElementById("hotel-price").value,
+        image: document.getElementById("hotel-image").value,
+        facilities,
+        rooms,
+        blockedRooms: blockList
+    };
+
+    if (editIndex !== null) hotels[editIndex] = hotel;
+    else hotels.push(hotel);
+
+    localStorage.setItem("hotels", JSON.stringify(hotels));
+    closeForm();
+    loadHotels();
+}
+
+/* EDIT HOTEL */
+function editHotel(i) {
+    openForm();
+    editIndex = i;
+    let h = hotels[i];
+
+    document.getElementById("hotel-name").value = h.name || "";
+    document.getElementById("hotel-location").value = h.location || "";
+    document.getElementById("hotel-address").value = h.address || "";
+    document.getElementById("platform-fee").value = h.platformFee || "";
+    document.getElementById("checkin-time").value = h.checkIn || "";
+    document.getElementById("checkout-time").value = h.checkOut || "";
+    document.getElementById("hotel-price").value = h.price || "";
+    document.getElementById("hotel-image").value = h.image || "";
+
+    h.facilities?.forEach(f => {
+        let cb = document.querySelector('.facility[value="' + f + '"]');
+        if (cb) cb.checked = true;
+    });
+
+    h.rooms.forEach(r => addRoom(r.name, r.price, r.photo));
+    document.getElementById("block-room-type").innerHTML =
+        h.rooms.map(r => `<option value="${r.name}">${r.name}</option>`).join("");
+
+    blockList = h.blockedRooms || [];
+    renderBlocks();
+}
+
+/* DELETE */
+function deleteHotel(i) {
+    if (!confirm("Delete this hotel?")) return;
+    hotels.splice(i, 1);
+    localStorage.setItem("hotels", JSON.stringify(hotels));
+    loadHotels();
+}
+
+loadHotels();
+</script>
+
+</body>
+</html>

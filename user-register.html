@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Register - TempleStay</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<style>
+    button {
+            width: 100%;
+            background: #e74c3c;
+            color: white;
+            padding: 12px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+</style>
+<body>
+
+<div class="auth-container">
+    <h2>Create Account</h2>
+
+    <form onsubmit="event.preventDefault(); userRegister();">
+
+        <input type="text" id="regName" placeholder="Full Name" required>
+        <input type="email" id="regEmail" placeholder="Email Address" required>
+        <input type="tel" id="regPhone" placeholder="Phone Number" required>
+        <input type="password" id="regPass" placeholder="Create Password" required>
+        <input type="password" id="regCPass" placeholder="Confirm Password" required>
+
+        <button type="submit">Register</button>
+
+    </form>
+
+    <a href="user-login.html" class="switch-link">Already have an account? Login</a>
+</div>
+
+<script>
+/* ===========================================================
+   USER REGISTER FUNCTION
+=========================================================== */
+function userRegister() {
+
+    let name = document.getElementById("regName").value.trim();
+    let email = document.getElementById("regEmail").value.trim();
+    let phone = document.getElementById("regPhone").value.trim();
+    let pass = document.getElementById("regPass").value;
+    let cpass = document.getElementById("regCPass").value;
+
+    // Check password match
+    if (pass !== cpass) {
+        alert("Passwords do not match!");
+        return;
+    }
+
+    // Load existing users
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+
+    // Check duplicate email
+    if (users.some(u => u.email === email)) {
+        alert("This email is already registered.");
+        return;
+    }
+
+    // Create user object
+    let newUser = {
+        name,
+        email,
+        phone,
+        password: pass
+    };
+
+    // Save to storage
+    users.push(newUser);
+    localStorage.setItem("users", JSON.stringify(users));
+
+    alert("Registration successful! Please log in.");
+
+    // Redirect to login
+    window.location.href = "user-login.html";
+}
+</script>
+
+</body>
+</html>

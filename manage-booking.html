@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Bookings | GoMyTrip Admin</title>
+    <link rel="stylesheet" href="admin.css">
+    <script defer src="data.js"></script>
+    <script defer src="admin.js"></script>
+</head>
+
+<body onload="checkAdminLogin()">
+
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <h2 class="sidebar-title">GoMyTrip Admin</h2>
+    <a href="admin.html" class="menu-item">📊 Dashboard</a>
+    <a href="manage-booking.html" class="menu-item">🧾 Booking</a>
+    <a href="manage-hotel.html" class="menu-item">🏨 Manage Hotel</a>
+    <a href="manage-destination.html" class="menu-item">🌍 Destination</a>
+    <a href="manage-qeury.html" class="menu-item">🔍 Manage Query</a>
+    <a href="manage-review.html" class="menu-item active">★☆ Review</a>
+    <a href="create-admin.html" class="menu-item">👤 Create Admin</a>
+    <a href="revenue.html" class="menu-item">
+        <i class="icon">📈</i> Revenue
+    </a>
+    <button onclick="adminLogout()" class="admin-btn">Logout</button>
+</aside>
+
+<main class="main-panel">
+    <div class="top-header">
+        <h2>Manage Bookings</h2>
+    </div>
+
+    <div class="table-box">
+        <table>
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Name</th>
+                    <th>Hotel</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Status</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody id="recent-bookings"></tbody>
+        </table>
+    </div>
+</main>
+
+</body>
+</html>

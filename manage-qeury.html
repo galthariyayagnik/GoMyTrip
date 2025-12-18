@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Temples | GoMyTrip Admin</title>
+    <link rel="stylesheet" href="admin.css">
+    <script defer src="data.js"></script>
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f8;
+}
+.container{
+    max-width:1200px;
+    margin:30px auto;
+    background:#fff;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+h2{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+/* HEADER TABS */
+.tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+.tabs button{
+    flex:1;
+    padding:12px;
+    border:none;
+    cursor:pointer;
+    border-radius:6px;
+    background:#ddd;
+    font-size:15px;
+}
+.tabs button.active{
+    background:#e74c3c;
+    color:#fff;
+}
+
+/* TABLE */
+table{
+    width:100%;
+    table-layout:fixed;
+    border-collapse:collapse;
+}
+th,td{
+    padding:10px;
+    border:1px solid #ddd;
+    text-align:left;
+    vertical-align:top;
+    word-wrap:break-word;
+}
+/* FORCE TABLE HEADER TEXT VISIBILITY */
+th {
+    background-color: #2c3e50 !important;
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+tr:nth-child(even){
+    background:#f9f9f9;
+}
+
+/* COLUMN WIDTHS */
+th:nth-child(1),td:nth-child(1){width:8%;}
+th:nth-child(2),td:nth-child(2){width:16%;}
+th:nth-child(3),td:nth-child(3){width:16%;}
+th:nth-child(4),td:nth-child(4){width:18%;}
+th:nth-child(5),td:nth-child(5){width:20%;}
+th:nth-child(6),td:nth-child(6){width:10%;}
+th:nth-child(7),td:nth-child(7){width:12%; white-space:nowrap;}
+
+/* BADGES */
+.badge{
+    padding:4px 10px;
+    border-radius:12px;
+    font-size:12px;
+    color:#fff;
+    display:inline-block;
+}
+.pending{background:#f39c12;}
+.solved{background:#27ae60;}
+.notsolved{background:#c0392b;}
+
+/* BUTTONS */
+.action-btn{
+    padding:6px 10px;
+    border:none;
+    border-radius:4px;
+    cursor:pointer;
+    font-size:13px;
+}
+.solve{background:#2ecc71;color:#fff;}
+.notsolve{background:#e74c3c;color:#fff;}
+
+.hidden{display:none;}
+.small{font-size:13px;color:#555;}
+
+/* FIX CONTENT SHIFT DUE TO SIDEBAR */
+.container {
+    margin-left: 260px;   /* sidebar width + small gap */
+}
+
+/* RESPONSIVE FIX (MOBILE) */
+@media (max-width: 992px) {
+    .container {
+        margin-left: 0;
+    }
+}
+
+</style>
+
+</head>
+
+<body onload="checkAdminLogin()">
+
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <h2 class="sidebar-title">GoMyTrip Admin</h2>
+    <a href="admin.html" class="menu-item">📊 Dashboard</a>
+    <a href="manage-booking.html" class="menu-item">🧾 Booking</a>
+    <a href="manage-hotel.html" class="menu-item">🏨 Manage Hotel</a>
+    <a href="manage-destination.html" class="menu-item">🌍 Destination</a>
+    <a href="manage-qeury.html" class="menu-item">🔍 Manage Query</a>
+    <a href="manage-review.html" class="menu-item active">★☆ Review</a>
+    <a href="create-admin.html" class="menu-item">👤 Create Admin</a>
+    <a href="revenue.html" class="menu-item">
+        <i class="icon">📈</i> Revenue
+    </a>
+    <button onclick="adminLogout()" class="admin-btn">Logout</button>
+</aside>
+
+<div class="container">
+    <h2>Manage Customer Queries</h2>
+
+    <!-- TABS -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+    <div class="tabs">
+        <button id="tabPending" class="active" onclick="showSection('pending')">Pending Queries</button>
+        <button id="tabSolved" onclick="showSection('solved')">Solved Queries</button>
+        <button id="tabNotSolved" onclick="showSection('notsolved')">Not Solved Queries</button>
+    </div>
+
+    <!-- QUERY TYPE FILTER -->
+    <select id="typeFilter" onchange="load()" style="padding:8px;border-radius:6px;">
+        <option value="All">All Queries</option>
+        <option value="New">New Query</option>
+        <option value="Existing">Existing Query</option>
+    </select>
+</div>
+
+
+    <!-- PENDING -->
+    <div id="pendingSection">
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Customer / Booking</th>
+                    <th>Contact</th>
+                    <th>Travel Info</th>
+                    <th>Note</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="pendingTable"></tbody>
+        </table>
+    </div>
+
+    <!-- SOLVED -->
+    <div id="solvedSection" class="hidden">
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Customer / Booking</th>
+                    <th>Contact</th>
+                    <th>Travel Info</th>
+                    <th>Note</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="solvedTable"></tbody>
+        </table>
+    </div>
+
+    <!-- NOT SOLVED -->
+    <div id="notSolvedSection" class="hidden">
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Customer / Booking</th>
+                    <th>Contact</th>
+                    <th>Travel Info</th>
+                    <th>Note</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="notSolvedTable"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+let queries = JSON.parse(localStorage.getItem("queries")) || [];
+
+function showSection(section){
+    pendingSection.classList.add("hidden");
+    solvedSection.classList.add("hidden");
+    notSolvedSection.classList.add("hidden");
+
+    tabPending.classList.remove("active");
+    tabSolved.classList.remove("active");
+    tabNotSolved.classList.remove("active");
+
+    if(section==="pending"){
+        pendingSection.classList.remove("hidden");
+        tabPending.classList.add("active");
+    }
+    if(section==="solved"){
+        solvedSection.classList.remove("hidden");
+        tabSolved.classList.add("active");
+    }
+    if(section==="notsolved"){
+        notSolvedSection.classList.remove("hidden");
+        tabNotSolved.classList.add("active");
+    }
+}
+
+function load(){
+    pendingTable.innerHTML="";
+    solvedTable.innerHTML="";
+    notSolvedTable.innerHTML="";
+
+    const filterType = document.getElementById("typeFilter").value;
+
+    queries.forEach((q,i)=>{
+        if(filterType !== "All" && q.type !== filterType) return;
+
+        const nameOrBooking = q.type === "New" ? q.name : q.bookingId;
+        const contact = q.email ? q.email+"<br>"+q.phone : "-";
+        const travelInfo = q.destinations
+            ? `<div class="small">
+                Destinations: ${q.destinations.join(", ")}<br>
+                Check-in: ${q.checkin}<br>
+                Guests: ${q.guests}
+              </div>`
+            : "-";
+
+        const row = `
+        <tr>
+            <td>${q.type}</td>
+            <td>${nameOrBooking || "-"}</td>
+            <td>${contact}</td>
+            <td>${travelInfo}</td>
+            <td>${q.note}</td>
+            <td>
+                <span class="badge ${
+                    q.status==="Solved" ? "solved" :
+                    q.status==="NotSolved" ? "notsolved" : "pending"
+                }">
+                ${q.status || "Pending"}
+                </span>
+            </td>
+            <td>
+                ${
+                    !q.status || q.status==="Pending"
+                    ? `<button class="action-btn solve" onclick="mark(${i},'Solved')">Solve</button>
+                       <button class="action-btn notsolve" onclick="mark(${i},'NotSolved')">Not Solve</button>`
+                    : "-"
+                }
+            </td>
+        </tr>`;
+
+        if(q.status==="Solved") solvedTable.innerHTML+=row;
+        else if(q.status==="NotSolved") notSolvedTable.innerHTML+=row;
+        else pendingTable.innerHTML+=row;
+    });
+}
+
+function mark(index,status){
+    queries[index].status=status;
+    localStorage.setItem("queries",JSON.stringify(queries));
+    load();
+}
+
+load();
+</script>
+
+</body>
+</html>
